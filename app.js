@@ -24,12 +24,19 @@
   function addTyping() { const row = document.createElement('div'); row.className = 'message assistant'; row.id = 'typing'; const avatar = document.createElement('div'); avatar.className = 'avatar'; avatar.textContent = '✳'; const dots = document.createElement('div'); dots.className = 'bubble typing'; dots.innerHTML = '<span></span><span></span><span></span>'; row.append(avatar, dots); chat.append(row); row.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
   function setBusy(value) { busy = value; sendButton.disabled = value; promptBox.disabled = value; }
   function friendlyError(response, data) {
-    const message = data?.error?.message || '';
-    if (response.status === 400) return 'الطلب غير مقبول. تأكد من المفتاح أو جرّب رسالة أقصر.';
-    if (response.status === 403 || response.status === 401) return 'المفتاح غير صالح أو لا يملك صلاحية Gemini. راجعه من Google AI Studio.';
+    const error = data?.error || {};
+    const message = String(error.message || '');
+    const details = Array.isArray(error.details) ? error.details : [];
+    const reasons = details.map(item => String(item?.reason || '')).filter(Boolean);
+    const reasonText = reasons.join(' ').toUpperCase();
+    if (/API_KEY_INVALID|API key not valid/i.test(reasonText + ' ' + message)) return 'مفتاح Google غير صالح أو منسوخ ناقصًا. أنشئ مفتاح Gemini جديدًا في Google AI Studio والصقه من جديد.';
+    if (/API_KEY_HTTP_REFERRER_BLOCKED|HTTP_REFERRER_BLOCKED/i.test(reasonText + ' ' + message)) return 'Google حظر المفتاح بسبب قيود المواقع المسموح بها. أضف https://khalilbahri003.github.io/* إلى قيود المواقع للمفتاح.';
+    if (/SERVICE_DISABLED|API_DISABLED/i.test(reasonText + ' ' + message)) return 'فعّل Gemini API للمشروع المرتبط بالمفتاح في Google AI Studio، ثم جرّب مجددًا.';
+    if (response.status === 400) return 'Google رفض الطلب. تأكد من أن المفتاح خاص بـ Gemini API، وأن الرسالة قصيرة، ثم جرّب مجددًا.';
+    if (response.status === 401 || response.status === 403) return 'المفتاح لا يملك صلاحية استخدام Gemini API لهذا المشروع. راجع المفتاح وإعدادات API في Google AI Studio.';
     if (response.status === 404) return 'نموذج Gemini غير متاح لهذا المفتاح أو المشروع. تأكد من إعدادات Gemini API في Google AI Studio.';
     if (response.status === 429) return 'وصلت إلى حدّ الاستخدام أو الطلبات. راجع الحصة في Google AI Studio ثم حاول لاحقًا.';
-    if (!response.ok) return `تعذّر الرد (${response.status}). ${message ? 'راجع إعدادات Gemini API.' : 'حاول مرة أخرى.'}`;
+    if (!response.ok) return `تعذّر الرد (${response.status}). راجع إعدادات Gemini API أو حاول مرة أخرى.`;
     return 'حدث خطأ في الاتصال. تحقق من الإنترنت وحاول مرة أخرى.';
   }
   async function send(text) {
