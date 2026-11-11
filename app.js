@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const MODEL = 'gemini-2.5-flash';
+  const MODEL = 'gemini-3.5-flash-lite';
   const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
   const dialog = document.querySelector('#key-dialog');
   const keyInput = document.querySelector('#api-key');
@@ -27,6 +27,7 @@
     const message = data?.error?.message || '';
     if (response.status === 400) return 'الطلب غير مقبول. تأكد من المفتاح أو جرّب رسالة أقصر.';
     if (response.status === 403 || response.status === 401) return 'المفتاح غير صالح أو لا يملك صلاحية Gemini. راجعه من Google AI Studio.';
+    if (response.status === 404) return 'نموذج Gemini غير متاح لهذا المفتاح أو المشروع. تأكد من إعدادات Gemini API في Google AI Studio.';
     if (response.status === 429) return 'وصلت إلى حدّ الاستخدام أو الطلبات. راجع الحصة في Google AI Studio ثم حاول لاحقًا.';
     if (!response.ok) return `تعذّر الرد (${response.status}). ${message ? 'راجع إعدادات Gemini API.' : 'حاول مرة أخرى.'}`;
     return 'حدث خطأ في الاتصال. تحقق من الإنترنت وحاول مرة أخرى.';
