@@ -4,7 +4,7 @@
 
 ## التجربة
 
-افتح [رابط التجربة](https://khalilbahri003.github.io/mini-ai-chat/) بعد تفعيل GitHub Pages. أدخل مفتاحك الشخصي من [Google AI Studio](https://aistudio.google.com/app/apikey)، ثم اكتب سؤالك.
+جرّب [رفيق مباشرةً](https://khalilbahri003.github.io/mini-ai-chat/). أدخل مفتاحك الشخصي من [Google AI Studio](https://aistudio.google.com/app/apikey)، ثم اكتب سؤالك.
 
 ## التشغيل على جهازك
 
