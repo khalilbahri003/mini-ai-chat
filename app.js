@@ -29,14 +29,38 @@
     const details = Array.isArray(error.details) ? error.details : [];
     const reasons = details.map(item => String(item?.reason || '')).filter(Boolean);
     const reasonText = reasons.join(' ').toUpperCase();
-    if (/API_KEY_INVALID|API key not valid/i.test(reasonText + ' ' + message)) return 'مفتاح Google غير صالح أو منسوخ ناقصًا. أنشئ مفتاح Gemini جديدًا في Google AI Studio والصقه من جديد.';
-    if (/API_KEY_HTTP_REFERRER_BLOCKED|HTTP_REFERRER_BLOCKED/i.test(reasonText + ' ' + message)) return 'Google حظر المفتاح بسبب قيود المواقع المسموح بها. أضف https://khalilbahri003.github.io/* إلى قيود المواقع للمفتاح.';
-    if (/SERVICE_DISABLED|API_DISABLED/i.test(reasonText + ' ' + message)) return 'فعّل Gemini API للمشروع المرتبط بالمفتاح في Google AI Studio، ثم جرّب مجددًا.';
-    if (response.status === 400) return 'Google رفض الطلب. تأكد من أن المفتاح خاص بـ Gemini API، وأن الرسالة قصيرة، ثم جرّب مجددًا.';
-    if (response.status === 401 || response.status === 403) return 'المفتاح لا يملك صلاحية استخدام Gemini API لهذا المشروع. راجع المفتاح وإعدادات API في Google AI Studio.';
-    if (response.status === 404) return 'نموذج Gemini غير متاح لهذا المفتاح أو المشروع. تأكد من إعدادات Gemini API في Google AI Studio.';
-    if (response.status === 429) return 'وصلت إلى حدّ الاستخدام أو الطلبات. راجع الحصة في Google AI Studio ثم حاول لاحقًا.';
-    if (!response.ok) return `تعذّر الرد (${response.status}). راجع إعدادات Gemini API أو حاول مرة أخرى.`;
+    const diagnostic = `${String(error.status || '').toUpperCase()} ${reasonText} ${message}`;
+    const code = String(error.status || reasons[0] || `HTTP ${response.status}`);
+    const withCode = text => `${text}\nرمز Google: ${code}`;
+
+    if (/API_KEY_INVALID|API key not valid|reported as leaked|key was reported as leaked/i.test(diagnostic)) {
+      return withCode('مفتاح Gemini غير صالح أو أوقفته Google. أنشئ مفتاحًا جديدًا من Google AI Studio، ولا تشارك المفتاح هنا.');
+    }
+    if (/API_KEY_HTTP_REFERRER_BLOCKED|HTTP_REFERRER_BLOCKED|referer.*blocked|referrer.*blocked/i.test(diagnostic)) {
+      return withCode('قيود المواقع تمنع هذا الموقع. في إعدادات المفتاح، اسمح بـ https://khalilbahri003.github.io/* وتأكد أن Gemini API مسموح ضمن قيود الـAPI.');
+    }
+    if (/SERVICE_DISABLED|API_DISABLED|has not been used in project|is disabled/i.test(diagnostic)) {
+      return withCode('Gemini API غير مفعّل في المشروع المرتبط بالمفتاح. فعّله من Google AI Studio أو Google Cloud ثم جرّب من جديد.');
+    }
+    if (/FAILED_PRECONDITION/i.test(diagnostic)) {
+      return withCode('Google يقول إن شرطًا للمشروع غير مكتمل؛ قد لا تتوفر الحصة المجانية في بلدك أو قد يلزم إعداد الفوترة. راجع حالة المشروع في Google AI Studio.');
+    }
+    if (response.status === 402) {
+      return withCode('رصيد الدفع المسبق لدى Google غير كافٍ. راجع الرصيد أو الفوترة في المشروع المرتبط بالمفتاح.');
+    }
+    if (/RESOURCE_EXHAUSTED|RATE_LIMIT|QUOTA_EXCEEDED/i.test(diagnostic) || response.status === 429) {
+      return withCode('وصل المشروع إلى حدّ الاستخدام أو الطلبات. راجع الحصة في Google AI Studio ثم جرّب بعد تجددها.');
+    }
+    if (response.status === 401 || response.status === 403) {
+      return withCode('Google رفض صلاحية المفتاح. تأكد أنه مفتاح Gemini من Google AI Studio، وأن Generative Language API مسموح في قيود المفتاح والمشروع.');
+    }
+    if (/NOT_FOUND|MODEL_NOT_FOUND/i.test(diagnostic) || response.status === 404) {
+      return withCode('Google لم يجد النموذج أو المورد المطلوب. التطبيق يستخدم gemini-3.5-flash-lite؛ راجع تفعيل Gemini API وصلاحية النموذج للمشروع.');
+    }
+    if (/INVALID_ARGUMENT|invalid request/i.test(diagnostic) || response.status === 400) {
+      return withCode('Google رفض صيغة الطلب. حدّث الصفحة وجرّب رسالة أقصر؛ إذا استمر الخطأ، أرسل رمز الخطأ الظاهر من دون المفتاح.');
+    }
+    if (!response.ok) return withCode(`تعذّر رد Google (${response.status}). راجع إعداد Gemini API أو جرّب لاحقًا.`);
     return 'حدث خطأ في الاتصال. تحقق من الإنترنت وحاول مرة أخرى.';
   }
   async function send(text) {
