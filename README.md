@@ -1,28 +1,70 @@
-# رفيق — محادثة ذكاء اصطناعي صغيرة
+# Rafiq — A Lightweight AI Chat Application
 
-تطبيق ويب عربي بسيط يتصل بـ Gemini 3.5 Flash-Lite. كل شخص يدخل مفتاح API الخاص به؛ لا يوجد مفتاح مشترك أو مضمّن في ملفات المشروع.
+**Rafiq** is a simple, lightweight, Arabic-language AI chat application powered by **Gemini 3.5 Flash-Lite**. Each user provides their own Gemini API key, ensuring that no shared or hardcoded API key is included in the project.
 
-## التجربة
+##Try It Online
 
-جرّب [رفيق مباشرةً](https://khalilbahri003.github.io/mini-ai-chat/). أدخل مفتاحك الشخصي من [Google AI Studio](https://aistudio.google.com/app/apikey)، ثم اكتب سؤالك.
+[**Launch Rafiq**](https://khalilbahri003.github.io/mini-ai-chat/)
 
-## التشغيل على جهازك
+To get started, obtain your personal API key from [Google AI Studio](https://aistudio.google.com/app/apikey), enter it into the application, and start chatting.
 
-1. نزّل المشروع أو استنسخه.
-2. افتح الطرفية داخل مجلد المشروع وشغّل: `python3 -m http.server 8000`
-3. افتح `http://localhost:8000` في المتصفح.
-4. أدخل مفتاح Gemini API الخاص بك.
+## Run Locally
 
-لا تفتح `index.html` مباشرةً من `file://`؛ بعض المتصفحات تمنع طلبات API في هذا الوضع.
+To run Rafiq on your local machine:
 
-## الخصوصية والتكاليف
+1. Download or clone the project repository.
+2. Open a terminal in the project's root directory.
+3. Start a local development server:
 
-- المفتاح يبقى في ذاكرة صفحة المتصفح فقط؛ لا يُحفظ في التخزين المحلي أو ملفات تعريف الارتباط أو عنوان الرابط. إعادة تحميل الصفحة تمسحه.
-- عند إرسال رسالة، يصل المفتاح ونص المحادثة إلى Google لتوليد الرد. سجل المحادثة يبقى في ذاكرة التبويب فقط.
-- كل مستخدم مسؤول عن مفتاحه وحصته وأي رسوم يفرضها مزوّد الخدمة. قد تتغير الحدود والأسعار؛ راجع إعدادات حسابك قبل الاستخدام.
-- لا تدخل كلمات مرور أو بيانات شخصية أو مالية أو أي معلومات حساسة. هذا نموذج تجريبي صغير، وليس خدمة إنتاجية أو نظامًا لحماية الأسرار؛ استخدم مفتاحًا مقيّدًا بحصة/صلاحية مناسبة، وألغِه إذا انكشف.
-- لا تضع مفتاحك في GitHub أو تشاركه مع الآخرين. لا يحتاج الزائر إذنًا لمستودعك كي يستخدم رابط التجربة، لكن ملفات الواجهة التي يحمّلها المتصفح قابلة للفحص والحفظ.
+   ```bash
+   python3 -m http.server 8000
+   ```
 
-## التقنية
+4. Open the following address in your browser:
 
-واجهة HTML/CSS/JavaScript ثابتة بلا خادم. الطلبات تذهب مباشرة إلى واجهة Gemini GenerateContent باستخدام `gemini-3.5-flash-lite` ومفتاح يقدمه المستخدم في كل جلسة.
+   ```text
+   http://localhost:8000
+   ```
+
+5. Enter your personal Gemini API key to start using the application.
+
+> **Note:** Do not open `index.html` directly using the `file://` protocol. Some browsers restrict API requests in this mode. Use a local HTTP server instead.
+
+## Privacy, Security & Usage Costs
+
+Rafiq is designed to keep API credentials under the user's control:
+
+- **No embedded API keys:** The project does not contain a shared API key. Every user must provide their own.
+- **Temporary key storage:** The API key is held only in the browser page's memory. It is not stored in local storage, cookies, or the URL. Reloading the page clears it.
+- **Direct API communication:** When a message is submitted, the API key and conversation content are sent directly to Google to generate a response.
+- **Temporary conversation history:** Chat history is maintained in the current browser tab's memory and is not permanently stored by the application.
+- **Individual usage responsibility:** Each user is responsible for their own API key, usage quota, and any applicable charges. Usage limits and pricing may change, so check your Google AI Studio account settings before using the service.
+- **Sensitive information:** Avoid entering passwords, financial details, personal data, or other confidential information.
+
+> **Security Notice:** Rafiq is a lightweight demonstration project, not a production-grade service or a secure secrets-management system. Use an API key with appropriate restrictions and quotas, and revoke it immediately if it is exposed.
+
+**Important:** Never publish your API key on GitHub or share it with others. You do not need access to the project's repository to use the hosted application. However, all front-end files delivered to the browser can be inspected and downloaded by visitors.
+
+## 🛠️ Technology Stack
+
+Rafiq is built using a lightweight, serverless front-end architecture:
+
+- **HTML5** — Application structure.
+- **CSS3** — Styling and user interface.
+- **JavaScript** — Application logic and API communication.
+- **Google Gemini API** — AI-powered response generation.
+
+### API Configuration
+
+The application sends requests directly from the browser to Google's Gemini `GenerateContent` API endpoint.
+
+| Configuration | Value |
+|---|---|
+| AI Provider | Google |
+| Model | `gemini-3.5-flash-lite` |
+| API Endpoint | Gemini GenerateContent |
+| API Key | Provided by each user |
+| Backend | None |
+| Architecture | Static front-end |
+
+**Rafiq** is built to provide a straightforward way to interact with Google's Gemini AI through a simple Arabic-language interface, without requiring a dedicated backend or a shared API key.
